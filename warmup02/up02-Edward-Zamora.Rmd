@@ -1,0 +1,35 @@
+---
+title: "up2-Edward-Zamora"
+output: github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r salary}
+load("nba2017-salary-points.RData")
+ls()
+summary(salary)
+```
+
+*Average value for salary is 6187014. Most salaries are 5 million or less as shown by histogram which is swkewed right with subsequent values decreasing in frequency.*
+
+```{r s}
+hist(salary)
+boxplot(salary)
+plot(density(salary))
+
+
+
+table(team)
+prop.table(table(team))
+```
+
+
+*Players per team is a relatively uniform distribution with each team having at least 14 players but most have 15.*
+
+
+```{r bar}
+barplot(table(team))
+```
