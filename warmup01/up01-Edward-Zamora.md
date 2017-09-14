@@ -1,0 +1,40 @@
+Warm-Up 1
+================
+
+Scrambled Eggs
+--------------
+
+#### Ingredients:
+
+-   eggs
+-   pepper
+-   salt
+
+#### Tools:
+
+-   pan
+-   bowl
+-   spatula
+-   whisk
+
+#### Steps:
+
+1.  Heat pan over medium flame.
+2.  Crack eggs into bowl. Add salt and pepper as desired.
+3.  Mix eggs until yolk and whites are completeley combined.
+4.  Pour eggs into pan. Cook until eggs are firm, stirring occasionally.
+
+![](https://fthmb.tqn.com/rHR2oP2iDdShuA2P9xcTQvKInkI=/2500x1667/filters:no_upscale()/about/scrambled-eggs-2500-56a210c65f9b58b7d0c63169.jpg)
+
+> Dish is best served as breakfast. Vegetables and/or other seasoning may be used as desired for taste. Milk may be added for fluffier eggs as well.
+
+Quadratic Equation
+------------------
+
+A [*quadratic equation*](https://en.wikipedia.org/wiki/Quadratic_equation) is any equation with form *a**x*<sup>2</sup> + *b**x* + *c* = 0, where *x* represents an unknown value and variables *a*, *b*, and *c* are known coefficients.<br/>In a quadratic equation, values that satisfy *x* can be found using the *quadratic formula* for roots:
+$$x=\\frac{-b \\pm\\sqrt{b^2-4ac}}{2a} $$
+
+Reflection
+----------
+
+The general markdown syntax was not that difficult to understand and was one of the easier parts of this task. However, the LaTex syntax for writing mathematical equations took more time as I had to look up much of the notation for the more complicated mathematical symbols. Overall, I feel this assignment helped reinforce markdown knowledge while I learned a lot about LaTex notation.
