@@ -1,0 +1,186 @@
+---
+title: "hw01-edward-zamora"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+load("data/nba2017-salary-points.RData")
+```
+
+```{r}
+salary= round(salary/1000000, 2)
+experience = strtoi(replace(experience,experience=="R",0))
+position = as.factor(position)
+levels(position) = c('center','power_fwd','point_guard','small_fwd','shoot_guard')
+table(position)
+```
+
+####Scatterplot of Points and Salary
+```{r}
+plot(points,salary,xlab="Points",ylab="Salary (in millions)",pch=20,col=2)
+```
+
+
+
+
+
+Generally, salary seems to increase as the points a player scores increases although most players are shooting under 1000 points per game.
+
+
+####Correlation between Points and Salary
+$$n$$
+```{r}
+n = length(player)
+n
+```
+
+$$\bar{x}$$
+```{r}
+x = sum(points)/n
+x
+```
+$$\bar{y}$$
+```{r}
+y = sum(salary)/n
+y
+```
+$$var(X)$$
+```{r}
+varx=sum((points-x)^2)/(n-1)
+varx
+```
+$$var(Y)$$
+```{r}
+vary=sum((salary-y)^2)/(n-1)
+vary
+```
+$$sd(X)$$
+```{r}
+sdx=sqrt(varx)
+sdx
+```
+$$sd(Y)$$
+```{r}
+sdy=sqrt(vary)
+sdy
+```
+$$cov(X,Y)$$
+```{r}
+covxy=sum((points-x)*(salary-y))/(n-1)
+covxy
+```
+$$cor(X,Y)$$
+```{r}
+corxy=covxy/sdx/sdy
+corxy
+```
+
+####Simple Linear Regression
+$$b_1$$
+```{r}
+b_1=corxy*sdy/sdx
+```
+$$b_0$$
+```{r}
+b_0=y-b_1*x
+```
+$$\hat{Y}$$
+```{r}
+y_hat=b_0+b_1*salary
+```
+
+
+```{r}
+summary(y_hat)
+```
+
+_salary_=`r b_0`+`r b_1` _points_
+y_hat=b_0+b_1*X
+Slope b1 is the expected rate at which salary changes in relation to points.
+Intercept b0 is the expected salary when 0 points are scored.
+
+######Expected Salary
+```{r}
+b_0
+b_0+b_1*100
+b_0+b_1*500
+b_0+b_1*1000
+b_0+b_1*2000
+```
+
+```{r}
+plot(points,salary)
+abline(b_0,b_1)
+lines(lowess(points,salary))
+text(c(2250,2350),c(28,19),labels=c("lowess","regression"),cex=.65)
+```
+
+```{r}
+ei=salary-y_hat
+summary(ei)
+```
+
+$$RSS$$
+```{r}
+RSS = sum(ei^2)
+RSS
+```
+
+$$TSS$$
+```{r}
+TSS = sum((salary-y)^2)
+TSS
+```
+
+$$R^2$$
+```{r}
+R2 = 1-RSS/TSS
+R2
+```
+
+```{r}
+plot(experience,salary,main="Scatterplot with lowess smooth")
+lines(lowess(experience,salary))
+```
+
+
+
+
+
+
+
+
+
+
+The scatterplot show that the players who are maing most money are within the range of 5 to 10 years of experience. It appears that when most players are rookies their salary is at its lowest and then steadily decreaes after their prime years.
+
+
+```{r}
+boxplot(salary~position)
+```
+
+
+
+
+
+
+The boxplots as shown tend to have a positive skewwness with few, if any, outliers. Also, all the boxplots have a similar medians at about 4 million and ranges. Although position matters somehwat, as centers seem to be making the most on average, other positions can make just as much if not more money.
+
+```{r}
+library(scatterplot3d)
+scatterplot3d(points,experience,salary,main="3D Scatterplot")
+```
+
+
+
+
+The scatterplot shows that an upward trend in salary occurs when points scored increases. However in the several cases where points are the same, years of experience positiveley 
+effect salary.
+
+
+####Comments
+The hardest part of this assignment mainly dealt with the graphs. Overall, their creation and interpretation gave me the most trouble. The easier parts of this exam involved formulas that were already given and just needed computation. It took me about 3 hours to finish the assignment. The most time consuming part was looking up how certain functions worked.
