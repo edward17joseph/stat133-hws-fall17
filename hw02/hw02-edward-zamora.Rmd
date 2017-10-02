@@ -1,0 +1,98 @@
+
+---
+title: "hw02-edward-zamora"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###2017 NBA Player Statistics
+
+```{r}
+library("readr")
+type = list(col_character(),col_character(),col_factor(5),col_character(),col_double())
+type = append(type,rep(list(col_integer()), 19))
+dat = read_csv('nba2017-player-statistics.csv',col_types=type)
+str(dat)
+```
+
+```{r}
+type = c('character','character','factor','character','double')
+type = append(type,rep.int('integer',19))
+dat <- read.csv('nba2017-player-statistics.csv', stringsAsFactors = FALSE, colClasses = type)
+str(dat)
+```
+
+```{r}
+dat$Experience=strtoi(replace(dat$Experience,dat$Experience=='R',0))
+```
+
+###Performance of Players
+
+####EFF Calculation
+```{r}
+dat$Missed_FG=dat$FGA-dat$FGM
+dat$Missed_FT=dat$FTA-dat$FTM
+dat$PTS <- dat$Points2*2+dat$Points3*3+dat$FTM
+dat$REB = dat$OREB+dat$DREB
+dat$MPG= dat$MIN/dat$GP
+dat$EFF <- (dat$PTS+dat$REB+dat$AST+dat$STL+dat$BLK-dat$Missed_FG-dat$Missed_FT-dat$TO)/dat$GP
+summary(dat$EFF)
+hist(dat$EFF, col=2, xlab = "EFF", main = "Histogram of EFF")
+```
+
+```{r}
+library("dplyr")
+```
+
+####Top 10 Players by EFF
+```{r}
+select(slice(arrange(dat,desc(EFF)),1:10),Player,Team,Salary,EFF)
+```
+
+####Players with Negative EFF
+```{r}
+select(filter(dat,EFF<0),Player)
+```
+
+####EFF Correlations
+```{r}
+correlation = c(
+cor(dat$EFF,-dat$Missed_FG),
+cor(dat$EFF,-dat$Missed_FT),
+cor(dat$EFF,-dat$TO),
+cor(dat$EFF,dat$PTS),
+cor(dat$EFF,dat$REB),
+cor(dat$EFF,dat$AST),
+cor(dat$EFF,dat$STL),
+cor(dat$EFF,dat$BLK)
+)
+names=c('Missing_FG','Missing_FT','TO','PTS','REB','AST','STL','BLK')
+```
+
+```{r}
+correlations = arrange(data.frame(names,correlation),desc(correlation))
+correlations
+barplot(correlations$correlation,names.arg = correlations$names)
+```
+
+###Efficiency and Salary
+```{r}
+scatter.smooth(dat$EFF,dat$Salary,xlab='EFF',ylab='Salary', main='EFF Scatterplot for NBA')
+cor(dat$EFF,dat$Salary)
+```
+
+Since the correlations is `r cor(dat$EFF,dat$Salary)`, there appears to be a relativeley strong positive relationship between the two variables meaning that an increase in a player's EFF will likeley result in a higher salary.
+
+```{r}
+players2 <- dat[dat$MPG>20,]
+scatter.smooth(players2$EFF,players2$Salary,xlab='EFF',ylab='Salary',main='EFF Scatterplot for NBA Rookies')
+cor(players2$EFF,players2$Salary)
+```
+Through their correlation coefficient, it appears that as players become more experienced and receive more minutes per game, the less their salaries are affected by their EFF. Therefore, it could be said that the salary of rookies is more susceptible to how well the player performs.
+
+###Comments and Reflections
+
+The hardest part of the assignment was creating the initial data frame using both methods since the syntax for the 'readr' package was somewhat difficult to understand. Other than that, the next most challenging aspect ad the most time consuming part was just looking up the syntax of functions that we have already used which was not very hard at all. This assignment took me roughly 4 hours to complete with no help. The only part of the assignment I'm still not to sure about is creating a data frame using the 'readr' method as the structure of the object was fine although I did receive a weird message during execution.
