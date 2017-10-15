@@ -1,0 +1,64 @@
+---
+title: "hw03-edward-zamora"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library('dplyr')
+library('ggplot2')
+```
+
+```{r}
+dat <- read.csv("../data/nba2017-teams.csv")
+```
+
+```{r}
+ggplot(dat,aes(x=reorder(team,salary),y=salary))+geom_bar(stat ='identity')+coord_flip()+geom_line(aes(x=team,y=mean(salary),group=1,size=2,col="#FF0000",alpha=.7))+xlab("Team")+ylab("Salary (in millions)")+theme(legend.position = "none")+ggtitle('NBA Teams Ranked by Total Salary')
+```
+
+
+Teams are ranked by their total salaries in descending order. The Cleveland Cavaliers have the highest total salary at `r round(filter(dat,team=="CLE")$salary,2)` million dollars while the Philadelphia 76ers have the lowest total at `r round(filter(dat,team=='PHI')$salary,2)` million dollars. The average total salary of all NBA teams in 2017 was `r round(mean(dat$salary),2)` million dollars.
+```{r}
+ggplot(dat,aes(x=reorder(team,points),y=points))+geom_bar(stat ='identity')+coord_flip()+geom_line(aes(x=team,y=mean(points),group=1,size=2,col="#FF0000",alpha=.7))+xlab("Team")+ylab("Total Points")+theme(legend.position = "none")+ggtitle('NBA Teams Ranked by Total Points')
+```
+
+
+Teams are ranked by total points scored throughout the 2017 season. The Golden State Warriors scored the most with `r filter(dat,team=="GSW")$points` points while the Sacramento Kings scored the lowest with only `r filter(dat,team=="SAC")$points` points. The average number of points scored by all teams in the NBA this season is `r round(mean(dat$points),2)`.
+```{r}
+ggplot(dat,aes(x=reorder(team,efficiency),y=efficiency))+geom_bar(stat ='identity')+coord_flip()+geom_line(aes(x=team,y=mean(efficiency),group=1,size=2,col="#FF0000",alpha=.7))+xlab("Team")+ylab("Total Efficiency")+theme(legend.position = "none")+ggtitle('NBA Teams Ranked by Total Efficiency')
+```
+
+
+Here teams are ranked by total efficiency calculated using team statistics from the 2017 season. The Cleveland Cavaliers are the most efficient at `r filter(dat,team=="CLE")$efficiency` while the Orlando Magic are the least efficient at `r filter(dat,team=="ORL")$efficiency`. The average efficiency of all teams in the NBA this season is `r round(mean(dat$efficiency),2)`.
+```{r}
+pr <- prcomp(select(dat,points3,points2,free_throws,off_rebounds,def_rebounds,assists,steals,blocks,turnovers,fouls),scale. = TRUE)
+eg = pr$sdev^2
+m <- function(x){sum((eg/sum(eg))[1:x])}
+eigs = data.frame(eigenvalue=round(eg,4),prop=round(eg/sum(eg),4),cumprop=round(sapply(1:10,m),4))
+teampr <-data.frame(team=dat$team,pr$x[,1:2])
+```
+
+```{r}
+ggplot(teampr,aes(x=PC1,y=PC2))+geom_point(aes(alpha=0))+geom_text(aes(label=team))+theme(legend.position = "none")+ggtitle('PCA Plot (PC1 and PC2)')+geom_line(aes(x=0))+geom_line(aes(y=0))
+```
+
+```{r}
+pr$rotation[,1:2]
+```
+
+
+```{r}
+teampr = mutate(teampr,s=100*(PC1-min(teampr$PC1))/(max(teampr$PC1)-min(teampr$PC1)))
+
+ggplot(teampr,aes(x=reorder(team,s),y=s))+geom_bar(stat ='identity')+coord_flip()+xlab("Team")+ylab("First PC (scaled from 0 to 100)")+theme(legend.position = "none")+ggtitle('NBA Teams Ranked by Scaled PC1')
+```
+
+
+Here teams are ranked by the calculated PC1 which has been scaled to a value between 0 and 100. The Golden State Warriors have the highest index at `r filter(teampr,team=="GSW")$PC1` while the Sacramento Kings have the lowest at `r filter(teampr,team=="SAC")$PC1`.
+
+####Comments
+This assignment took about 5 hours to complete. The most time consuming part was cleaning the raw data although it wasn't too difficult. The hardest part that was covered in lecture was obtaining the values for the PCA and the easiest part not covered with formatting the graphs.
