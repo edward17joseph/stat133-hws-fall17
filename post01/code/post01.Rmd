@@ -212,7 +212,7 @@ Easy Way: Best since easily understood with any unnecessary notation eliminated.
 ###apply, lapply, sapply:
 
 <sup>[5](#l)</sup>
-<img src="../images/apply.png" style="width:600px;")>
+![](../images/apply.png)
 
 
 Three common higher order functions already built into the R language that are worth mentioning are the apply, sapply, and lapply functions. When dealing with nonvectorized functions (functions that don't automatically apply to every value in a vector), as in custom functions, that need to be applied over an array of values, these functions are extremeley useful. All the user needs is a set of values and a function to be passed in as arguments and the apply functions will return the values when passed thorugh the input function in some predertermined data type (list, vector, etc)<sup>[6](#m)</sup>. 
