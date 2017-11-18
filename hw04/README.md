@@ -15,5 +15,5 @@ Modify the content of this file.
 ```
 library(shiny)
 # Run an app from a subdirectory in the repo
-runGitHub("stat133-hws-fall17", "username", subdir = "hw04/app")
+runGitHub("stat133-hws-fall17", "edward17joseph", subdir = "hw04/app")
 ```
