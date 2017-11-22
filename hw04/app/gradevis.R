@@ -8,6 +8,8 @@
 #
 
 library(shiny)
+library(ggvis)
+source("../code/functions.r")
 dat <- read.csv("../data/cleandata/cleanscores.csv")
 
 # Define UI for application that draws a histogram
@@ -56,13 +58,13 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
         tabsetPanel(type = 'tabs', 
-                    tabPanel("Barchart",value=1,plotOutput("gradePlot",height=600)),
+                    tabPanel("Barchart",value=1,ggvisOutput("gradePlot")),
                     tabPanel("Histogram",value=2,
-                             plotOutput("HistPlot",height=600),
+                             ggvisOutput("HistPlot"),
                              h3(textOutput('caption1')),
                              verbatimTextOutput("view")),
                     tabPanel("Scatterplot",value=3,
-                             plotOutput("scatPlot",height=800),
+                             ggvisOutput("scatPlot"),
                              h3(textOutput('caption')),
                              verbatimTextOutput('cor')),
                     id='tabselected'
@@ -81,37 +83,45 @@ server <- function(input, output) {
   colnames(t) <- c('Grade','Freq','Prop')
   output$grade <- renderTable(t)
   
-  output$gradePlot <- renderPlot({
-    barplot(table(dat$Grade),xlab = 'Grade',ylab = 'frequency',col = 'lightblue',font.lab=2)
-    grid(nx = 10,lty = 'solid')})
-  
-  output$scatPlot <- renderPlot({
-    plot(dat[[input$xax]],dat[[input$yax]],
-         col=adjustcolor('black',input$opac),pch=16,cex=2,xlab = input$xax,ylab=input$yax,font.lab=2)
-    axis(1, at=seq(0,100,10), labels=seq(0,100,10))
-    axis(2, at=seq(0,100,10), labels=seq(0,100,10))
-    grid(nx = 10,lty = 'solid')
-    if (input$line=='lm'){
-      abline(lm(dat[[input$xax]]~dat[[input$yax]]), col="red") 
-    }
-    if (input$line=='loess'){
-      lines(lowess(dat[[input$xax]],dat[[input$yax]]), col="blue")
-    }
-  })
-  
   output$cor <- renderPrint(cat(cor(dat[[input$xax]],dat[[input$yax]])))
   
   output$caption <- renderText('Correlation:')
   
-  output$HistPlot <- renderPlot({
-    x    <- dat[[input$type]] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    h <- hist(x, breaks = bins, col = 'darkgray', border = 'white',xlim = c(-10,110),xaxt='n',xlab = input$type,
-              ylab = 'count',font.lab=2,main = NULL)
-    grid(nx = 10,lty = 'solid')
-    axis(1, at=seq(-10,110,10), labels=seq(-10,110,10))
+  vis_plot1 <- reactive({
+    data <- as.data.frame(table(dat$Grade))
+    names(data) <- c("Grades","Frequency")
+    bar <- data%>%
+      ggvis(x = ~Grades,y=~Frequency,fill:='lightblue') %>%
+      layer_bars()
   })
+  bind_shiny(vis_plot1,"gradePlot")
+  
+  vis_plot2 <- reactive({
+    xvar <- prop("x", as.symbol(input$type))
+    histogram <- dat %>%
+      ggvis(x = xvar) %>%
+      layer_histograms(stroke := 'white', width = input$bins)
+  })
+  bind_shiny(vis_plot2,"HistPlot")
+  
+  vis_plot3 <- reactive({
+    if (input$line!='none'){
+      xvar <- prop("x", as.symbol(input$xax))
+      yvar <- prop("y", as.symbol(input$yax))
+      histogram <- dat %>%
+        ggvis(x = xvar,y=yvar,opacity:=input$opac) %>%
+        layer_points()%>%
+        layer_model_predictions(model = input$line,opacity:=1,stroke:='red')
+    }else{
+      xvar <- prop("x", as.symbol(input$xax))
+      yvar <- prop("y", as.symbol(input$yax))
+      histogram <- dat %>%
+        ggvis(x = xvar,y=yvar,opacity:=input$opac) %>%
+        layer_points()
+    }
+  })
+  bind_shiny(vis_plot3,"scatPlot")
+  
   
   output$view <- renderPrint(print_stats(summary_stats(dat[[input$type]])))
   
